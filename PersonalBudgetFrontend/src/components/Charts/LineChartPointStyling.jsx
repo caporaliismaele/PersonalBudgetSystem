@@ -31,9 +31,7 @@ export const LineChartPointStyling = () => {
         if (!user || !user.token) return;
 
         axios
-            .get("/api/charts/balance", {
-                headers: { Authorization: `Bearer ${user.token}` }
-            })
+            .get("/api/charts/balance")
             .then((res) => {
                 const rawData = res.data;
 

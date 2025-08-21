@@ -1,10 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState} from 'react';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext.jsx';
 import theme from '../../styles/theme.js';
 
 function AddCategory({ onCategoryAdded }) {
-    const { user } = useContext(AuthContext);
+
     const [name, setName] = useState('');
     const [type, setType] = useState('Income');
 
@@ -14,8 +14,6 @@ function AddCategory({ onCategoryAdded }) {
             const response = await axios.post('https://localhost:7163/api/categories', {
                 name,
                 type
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
             });
             onCategoryAdded(response.data);
             setName('');

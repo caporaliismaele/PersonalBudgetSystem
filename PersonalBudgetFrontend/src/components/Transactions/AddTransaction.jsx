@@ -21,9 +21,8 @@ function AddTransaction({ refreshKey, onTransactionAdded }) {
 
     useEffect(() => {
         if (user) {
-            axios.get('https://localhost:7163/api/categories', {
-                headers: { Authorization: `Bearer ${user.token}` }
-            }).then(response => {
+            axios.get('https://localhost:7163/api/categories')
+                .then(response => {
                 const filtered = response.data.filter(c => c.type === formData.type);
                 setCategories(filtered);
                 if (!filtered.find(c => c.name === formData.category)) {

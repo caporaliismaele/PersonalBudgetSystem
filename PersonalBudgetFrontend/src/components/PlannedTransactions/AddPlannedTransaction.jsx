@@ -25,8 +25,6 @@ function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
                 dayOfMonth: parseInt(dayOfMonth),
                 category,
                 description,
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
             });
 
             onPlannedTransactionAdded(response.data);

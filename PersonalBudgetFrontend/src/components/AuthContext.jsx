@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // es: { email: 'utente@mail.com', token: '...' }
+    const [user, setUser] = useState(null); 
 
     useEffect(() => {
         const storedUser = sessionStorage.getItem('user');
@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
             setUser(parsed);
         }
 
-        // Interceptor Axios per aggiungere il token a ogni richiesta
+        // Axios interceptor to add the token to each request
         const interceptor = axios.interceptors.request.use(config => {
             const currentUser = JSON.parse(sessionStorage.getItem('user'));
             if (currentUser?.token) {
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
             return config;
         });
 
-        // Cleanup dell’interceptor quando il componente viene smontato
+        // Cleanup the interceptor when the component is disassembled
         return () => {
             axios.interceptors.request.eject(interceptor);
         };

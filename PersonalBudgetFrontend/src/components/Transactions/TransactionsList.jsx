@@ -13,7 +13,6 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
     const [categories, setCategories] = useState([]);
     const [dateRange, setDateRange] = useState('All');
 
-    const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
 
     const getStartDateFromRange = () => {
         const now = new Date();
@@ -41,7 +40,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
 
         const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-        axios.get(url, { headers })
+        axios.get(url)
             .then(response => {
                 setTransactions(response.data);
                 setLoading(false);
@@ -60,7 +59,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
             return;
         }
 
-        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`, { headers })
+        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`)
             .then(response => {
                 setCategories(response.data);
                 setCategoryFilter('');
@@ -71,7 +70,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
     }, [user, typeFilter]);
 
     const handleDelete = (id) => {
-        axios.delete(`https://localhost:7163/api/transactions/${id}`, { headers })
+        axios.delete(`https://localhost:7163/api/transactions/${id}`)
             .then(() => onTransactionDeleted())
             .catch(error => console.error('Error deleting transaction:', error));
     };
@@ -135,7 +134,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
                 <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff' }}>
                     <thead>
                         <tr style={{ backgroundColor: theme.colors.primary, color: '#fff' }}>
-                            {['Description', 'Amount', 'Type', 'Category', 'Action'].map(header => (
+                            {['Description', 'Amount', 'Type', 'Category', 'Date', 'Action'].map(header => (
                                 <th key={header} style={{
                                     padding: '0.75rem',
                                     border: `1px solid ${theme.colors.border}`,
@@ -164,6 +163,14 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
                                 <td style={tdStyle}>
                                     {transaction.category}
                                 </td>
+                                <td style={tdStyle}>
+                                    {new Date(transaction.date).toLocaleDateString('it-IT', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                    })}
+                                </td>
+
                                 <td style={tdStyle}>
                                     <button
                                         onClick={() => handleDelete(transaction.id)}

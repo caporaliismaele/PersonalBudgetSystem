@@ -23,9 +23,7 @@ export const VerticalBarChart = () => {
     if (!user || !user.token) return;
 
     axios
-      .get("/api/charts/cashflow", {
-        headers: { Authorization: `Bearer ${user.token}` }
-      })
+      .get("/api/charts/cashflow")
       .then((res) => {
         const labels = res.data.map((d) => d.month);
         const cashflow = res.data.map((d) => d.cashflow);

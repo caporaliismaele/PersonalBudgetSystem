@@ -20,9 +20,8 @@ export const PieChart = () => {
     useEffect(() => {
         if (!user || !user.token) return;
 
-        axios.get(`/api/charts/statsForType/${type}`, {
-            headers: { Authorization: `Bearer ${user.token}` }
-        }).then(res => {
+        axios.get(`/api/charts/statsForType/${type}`)
+            .then(res => {
             const labels = res.data.map(d => d.category);
             const amounts = res.data.map(d => d.amount);
 

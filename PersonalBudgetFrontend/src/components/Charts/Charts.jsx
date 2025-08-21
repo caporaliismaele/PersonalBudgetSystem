@@ -12,13 +12,12 @@ function Charts() {
     const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
 
     useEffect(() => {
         if (!user) return;
 
         axios
-            .get('https://localhost:7163/api/transactions/balance', { headers })
+            .get('https://localhost:7163/api/transactions/balance')
             .then((response) => {
                 setBalance(response.data);
                 setLoading(false);

@@ -9,7 +9,6 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState('All');
 
-    const headers = user?.token ? { Authorization: `Bearer ${user.token}` } : {};
 
     const fetchCategories = async () => {
         try {
@@ -22,7 +21,7 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
 
             const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-            const response = await axios.get(url, { headers });
+            const response = await axios.get(url);
             setCategories(response.data);
             setLoading(false);
         } catch (error) {
@@ -37,7 +36,7 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`https://localhost:7163/api/categories/${id}`, { headers });
+            await axios.delete(`https://localhost:7163/api/categories/${id}`);
             onCategoryDeleted();
         } catch (error) {
             console.error('Error deleting category:', error);
