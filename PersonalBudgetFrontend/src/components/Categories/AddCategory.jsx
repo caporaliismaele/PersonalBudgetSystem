@@ -14,7 +14,7 @@ function AddCategory({ onCategoryAdded }) {
             const response = await axios.post('https://localhost:7163/api/categories', {
                 name,
                 type
-            });
+            }, { withCredentials: true });
             onCategoryAdded(response.data);
             setName('');
         } catch (error) {

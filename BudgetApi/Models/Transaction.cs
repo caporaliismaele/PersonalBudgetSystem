@@ -1,4 +1,7 @@
-﻿namespace BudgetApi.Models
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Text.Json.Serialization;
+
+namespace BudgetApi.Models
 {
     public class Transaction
     {
@@ -9,7 +12,7 @@
         public DateTime Date { get; set; }
         public string Type { get; set; } // "Income" or "Expense"
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         public int? PlannedTransactionId { get; set; }
     }

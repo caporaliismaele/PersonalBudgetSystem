@@ -26,7 +26,7 @@ public class ChartsController : ControllerBase
     [HttpGet("cashflow")]
     public async Task<IActionResult> GetCashflow()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         var now = DateTime.Now;
         var startDate = now.AddMonths(-11); // ultimi 12 mesi inclusi
@@ -66,7 +66,7 @@ public class ChartsController : ControllerBase
     [HttpGet("balance")]
     public async Task<IActionResult> GetBalance()
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var now = DateTime.Now;
         var startDate = new DateTime(now.Year, now.Month, 1).AddMonths(-11); 
 
@@ -115,7 +115,7 @@ public class ChartsController : ControllerBase
     {
         if (type != "Income" && type != "Expense") return BadRequest("Invalid type");
 
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var now = DateTime.Now;
 
         var transactions = await _context.Transactions

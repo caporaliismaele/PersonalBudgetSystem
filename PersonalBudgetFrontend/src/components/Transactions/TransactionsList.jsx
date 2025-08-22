@@ -40,7 +40,9 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
 
         const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-        axios.get(url)
+        axios.get(url, {
+            withCredentials: true
+        })
             .then(response => {
                 setTransactions(response.data);
                 setLoading(false);
@@ -51,6 +53,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
             });
     }, [user, typeFilter, categoryFilter, dateRange, refreshKey]);
 
+
     useEffect(() => {
         if (!user) return;
         if (typeFilter === 'All') {
@@ -59,7 +62,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
             return;
         }
 
-        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`)
+        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`, { withCredentials: true })
             .then(response => {
                 setCategories(response.data);
                 setCategoryFilter('');
@@ -70,7 +73,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
     }, [user, typeFilter]);
 
     const handleDelete = (id) => {
-        axios.delete(`https://localhost:7163/api/transactions/${id}`)
+        axios.delete(`https://localhost:7163/api/transactions/${id}`, { withCredentials: true })
             .then(() => onTransactionDeleted())
             .catch(error => console.error('Error deleting transaction:', error));
     };

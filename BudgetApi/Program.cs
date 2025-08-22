@@ -4,16 +4,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 
-
-
-
 var builder = WebApplication.CreateBuilder(args);
-
-
-
 
 // 🔧 CORS
 builder.Services.AddCors(options =>
@@ -35,29 +28,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BudgetDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+// 🔧 Identity
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<BudgetDbContext>()
     .AddDefaultTokenProviders();
 
-
-
-// 🔧 Controllers
-builder.Services.AddControllers();
-
-// 🔧 HTTPS + HTTP
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenLocalhost(5022); // HTTP
-    options.ListenLocalhost(7163, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
-});
-
-
-
-//autentication
+// 🔧 Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "JwtBearer";
@@ -65,7 +41,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer("JwtBearer", options =>
 {
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -77,6 +53,24 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// 🔧 Filtro personalizzato per ModelState
+builder.Services.AddScoped<ModelStateLoggerFilter>();
+
+// 🔧 Controllers con filtro registrato come servizio
+builder.Services.AddControllers(options =>
+{
+    options.Filters.AddService<ModelStateLoggerFilter>();
+});
+
+// 🔧 HTTPS + HTTP
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenLocalhost(5022); // HTTP
+    options.ListenLocalhost(7163, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
 
 var app = builder.Build();
 
@@ -87,25 +81,10 @@ app.UseSwaggerUI();
 // ✅ CORS prima di tutto
 app.UseCors("AllowReactApp");
 
+// ✅ Pipeline
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseAuthorization();
-
 
 app.Run();
-
-/*app.Use(async (context, next) =>
-{
-    try
-    {
-        await next();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Errore: {ex.Message}");
-        throw;
-    }
-});*/
-

@@ -25,7 +25,7 @@ function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
                 dayOfMonth: parseInt(dayOfMonth),
                 category,
                 description,
-            });
+            }, { withCredentials: true });
 
             onPlannedTransactionAdded(response.data);
             setName('');
@@ -41,9 +41,7 @@ function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
 
     const fetchCategories = async (type) => {
         try {
-            const response = await axios.get('https://localhost:7163/api/categories', {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
+            const response = await axios.get('https://localhost:7163/api/categories', { withCredentials: true });
             const filtered = response.data.filter(c => c.type === type);
             setCategories(filtered);
             if (!filtered.find(c => c.name === category)) {

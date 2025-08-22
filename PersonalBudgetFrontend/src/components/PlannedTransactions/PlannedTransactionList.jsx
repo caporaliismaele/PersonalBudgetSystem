@@ -22,7 +22,7 @@ function PlannedTransactionList({ refreshKey, onPlannedTransactionDeleted }) {
 
             const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-            const response = await axios.get(url);
+            const response = await axios.get(url, { withCredentials: true });
             setPlannedTransactions(response.data);
         } catch (error) {
             console.error('Error fetching planned transactions:', error);
@@ -41,7 +41,7 @@ function PlannedTransactionList({ refreshKey, onPlannedTransactionDeleted }) {
         }
 
 
-        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`)
+        axios.get(`https://localhost:7163/api/categories?type=${typeFilter}`, { withCredentials: true })
             .then(response => {
                 setCategories(response.data);
                 setCategoryFilter('');
@@ -53,7 +53,7 @@ function PlannedTransactionList({ refreshKey, onPlannedTransactionDeleted }) {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`https://localhost:7163/api/plannedtransaction/${id}`);
+            await axios.delete(`https://localhost:7163/api/plannedtransaction/${id}`, { withCredentials: true });
             onPlannedTransactionDeleted();
         } catch (error) {
             console.error('Error deleting planned transaction:', error);

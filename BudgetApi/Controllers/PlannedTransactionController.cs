@@ -24,7 +24,7 @@ public class PlannedTransactionController : ControllerBase
     [FromQuery] string? type,
     [FromQuery] string? category)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         var query = _context.PlannedTransactions
             .Where(pt => pt.UserId == userId)
@@ -50,10 +50,20 @@ public class PlannedTransactionController : ControllerBase
 
     // POST: api/plannedtransaction
     [HttpPost]
-    public async Task<IActionResult> CreatePlannedTransaction([FromBody] PlannedTransaction pt)
+    public async Task<IActionResult> CreatePlannedTransaction([FromBody] PlannedTransactionCreateDto dto)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        pt.UserId = userId; // associa automaticamente all'utente loggato
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var pt = new PlannedTransaction
+        {
+            Description = dto.Description,
+            Amount = dto.Amount,
+            Category = dto.Category,
+            StartDate =  DateTime.UtcNow,
+            Type = dto.Type,
+            DayOfMonth = dto.DayOfMonth,
+            UserId = userId // associa automaticamente all'utente loggato
+        };
 
         _context.PlannedTransactions.Add(pt);
         await _context.SaveChangesAsync();
@@ -61,11 +71,12 @@ public class PlannedTransactionController : ControllerBase
         return CreatedAtAction(nameof(GetUserPlannedTransactions), new { id = pt.Id }, pt);
     }
 
+
     // DELETE: api/plannedtransaction/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePlannedTransaction(int id)
     {
-        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var pt = await _context.PlannedTransactions.FindAsync(id);
 
         if (pt == null || pt.UserId != userId)
@@ -77,3 +88,13 @@ public class PlannedTransactionController : ControllerBase
         return NoContent();
     }
 }
+public class PlannedTransactionCreateDto
+{
+    public string Description { get; set; }
+    public decimal Amount { get; set; }
+    public string Category { get; set; }
+
+    public string Type { get; set; } 
+    public int DayOfMonth { get; set; } 
+}
+

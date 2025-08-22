@@ -21,7 +21,7 @@ function AddTransaction({ refreshKey, onTransactionAdded }) {
 
     useEffect(() => {
         if (user) {
-            axios.get('https://localhost:7163/api/categories')
+            axios.get('https://localhost:7163/api/categories', { withCredentials: true })
                 .then(response => {
                 const filtered = response.data.filter(c => c.type === formData.type);
                 setCategories(filtered);
@@ -65,9 +65,8 @@ function AddTransaction({ refreshKey, onTransactionAdded }) {
             amount: parseFloat(formData.amount),
         };
 
-        axios.post('https://localhost:7163/api/transactions', newTransaction, {
-            headers: { Authorization: `Bearer ${user.token}` }
-        })
+        console.log("Dati inviati:", newTransaction);
+        axios.post('https://localhost:7163/api/transactions', newTransaction, { withCredentials: true })
             .then(response => {
                 console.log('Transaction added:', response.data);
                 onTransactionAdded();
@@ -75,7 +74,7 @@ function AddTransaction({ refreshKey, onTransactionAdded }) {
             .catch(error => {
                 console.error('Errore nell’aggiunta della transazione:', error);
             });
-    };
+        };
 
     const inputStyle = {
         padding: '0.4rem 0.6rem',

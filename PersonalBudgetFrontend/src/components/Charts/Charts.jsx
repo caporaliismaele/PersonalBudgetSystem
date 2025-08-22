@@ -17,7 +17,7 @@ function Charts() {
         if (!user) return;
 
         axios
-            .get('https://localhost:7163/api/transactions/balance')
+            .get('https://localhost:7163/api/transactions/balance', { withCredentials: true })
             .then((response) => {
                 setBalance(response.data);
                 setLoading(false);

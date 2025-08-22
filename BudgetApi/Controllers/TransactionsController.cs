@@ -27,7 +27,7 @@ namespace BudgetApi.Controllers
             [FromQuery] DateTime? date)
         {
             // Prendi l'ID dell'utente dal token JWT
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var query = _context.Transactions
                 .Where(t => t.UserId == userId)
@@ -53,13 +53,20 @@ namespace BudgetApi.Controllers
 
         // POST: api/transactions
         [HttpPost]
-        public async Task<ActionResult<Transaction>> PostTransaction([FromBody] Transaction transaction)
+        [HttpPost]
+        public async Task<ActionResult<Transaction>> PostTransaction([FromBody] TransactionCreateDto dto)
         {
-            // Prendi l'ID dell'utente dal token JWT
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            transaction.UserId = userId;
-            transaction.Date = transaction.Date == default ? DateTime.UtcNow : transaction.Date;
+            var transaction = new Transaction
+            {
+                Description = dto.Description,
+                Amount = dto.Amount,
+                Category = dto.Category,
+                Date = dto.Date == default ? DateTime.UtcNow : dto.Date,
+                Type = dto.Type,
+                UserId = userId
+            };
 
             _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
@@ -67,11 +74,12 @@ namespace BudgetApi.Controllers
             return CreatedAtAction(nameof(GetTransactions), new { id = transaction.Id }, transaction);
         }
 
+
         // DELETE: api/transactions/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var transaction = await _context.Transactions
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
@@ -91,7 +99,7 @@ namespace BudgetApi.Controllers
         [HttpGet("balance")]
         public async Task<ActionResult<decimal>> GetBalance()
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var income = await _context.Transactions
                 .Where(t => t.Type == "Income" && t.UserId == userId)
@@ -106,4 +114,14 @@ namespace BudgetApi.Controllers
             return Ok(balance);
         }
     }
+    public class TransactionCreateDto
+    {
+        public string Description { get; set; }
+        public decimal Amount { get; set; }
+        public string Category { get; set; }
+        public DateTime Date { get; set; }
+        public string Type { get; set; }
+        public int? PlannedTransactionId { get; set; }
+    }
+
 }
