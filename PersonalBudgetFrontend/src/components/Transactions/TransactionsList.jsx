@@ -1,18 +1,14 @@
-﻿import React, { useEffect, useState, useContext } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../AuthContext.jsx';
-import theme from '../../styles/theme.js';
+import css from '../../styles/css.js';
 
 function TransactionsList({ refreshKey, onTransactionDeleted }) {
-    const { user } = useContext(AuthContext);
-
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState('All');
     const [categoryFilter, setCategoryFilter] = useState('');
     const [categories, setCategories] = useState([]);
     const [dateRange, setDateRange] = useState('All');
-
 
     const getStartDateFromRange = () => {
         const now = new Date();
@@ -27,8 +23,6 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
     };
 
     useEffect(() => {
-        if (!user) return;
-
         const baseUrl = 'https://localhost:7163/api/transactions';
         const params = new URLSearchParams();
 
@@ -40,9 +34,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
 
         const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
-        axios.get(url, {
-            withCredentials: true
-        })
+        axios.get(url, { withCredentials: true })
             .then(response => {
                 setTransactions(response.data);
                 setLoading(false);
@@ -51,11 +43,9 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
                 console.error('Error fetching transactions:', error);
                 setLoading(false);
             });
-    }, [user, typeFilter, categoryFilter, dateRange, refreshKey]);
-
+    }, [typeFilter, categoryFilter, dateRange, refreshKey]);
 
     useEffect(() => {
-        if (!user) return;
         if (typeFilter === 'All') {
             setCategories([]);
             setCategoryFilter('');
@@ -70,7 +60,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
             .catch(error => {
                 console.error('Error fetching categories:', error);
             });
-    }, [user, typeFilter]);
+    }, [typeFilter]);
 
     const handleDelete = (id) => {
         axios.delete(`https://localhost:7163/api/transactions/${id}`, { withCredentials: true })
@@ -80,50 +70,33 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
 
     if (loading) return <div>Loading...</div>;
 
-    const inputStyle = {
-        padding: '0.6rem',
-        fontSize: '1rem',
-        borderRadius: '6px',
-        border: `1px solid ${theme.colors.border}`,
-        width: '200px',
-        marginTop: '0.3rem'
-    };
-
-    const labelStyle = {
-        fontWeight: 'bold',
-        marginBottom: '0.2rem',
-        fontSize: '1rem',
-        textAlign: 'center'
-    };
-    const tdStyle = { padding: '0.75rem', border: `1px solid ${theme.colors.border}`, textAlign: 'center' };
-
     return (
-        <div style={{ padding: '2rem', fontFamily: theme.font.family }}>
-            <h3 style={{ textAlign: 'center', color: theme.colors.primary, marginBottom: '1.5rem' }}>
-                Your Transactions
-            </h3>
+        <div style={css.categoriesWrapper}>
+            <h3 style={css.categoriesTitle}>Your Transactions</h3>
 
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={labelStyle}>Type</label>
-                    <select style={inputStyle} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+            <div style={css.filterGroup}>
+                <div style={css.filterField}>
+                    <label style={css.formLabel}>Type</label>
+                    <select style={css.formSelect} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
                         <option value="All">All</option>
                         <option value="Income">Income</option>
                         <option value="Expense">Expense</option>
                     </select>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={labelStyle}>Category</label>
-                    <select style={inputStyle} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+
+                <div style={css.filterField}>
+                    <label style={css.formLabel}>Category</label>
+                    <select style={css.formSelect} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                         <option value="">All</option>
                         {categories.map(category => (
                             <option key={category.id} value={category.name}>{category.name}</option>
                         ))}
                     </select>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={labelStyle}>Date Range</label>
-                    <select style={inputStyle} value={dateRange} onChange={e => setDateRange(e.target.value)}>
+
+                <div style={css.filterField}>
+                    <label style={css.formLabel}>Date Range</label>
+                    <select style={css.formSelect} value={dateRange} onChange={e => setDateRange(e.target.value)}>
                         <option value="All">All</option>
                         <option value="1M">Last 1 Month</option>
                         <option value="3M">Last 3 Months</option>
@@ -134,58 +107,35 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
             </div>
 
             {transactions.length > 0 ? (
-                <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff' }}>
+                <table style={css.table}>
                     <thead>
-                        <tr style={{ backgroundColor: theme.colors.primary, color: '#fff' }}>
+                        <tr style={css.tableHeader}>
                             {['Description', 'Amount', 'Type', 'Category', 'Date', 'Action'].map(header => (
-                                <th key={header} style={{
-                                    padding: '0.75rem',
-                                    border: `1px solid ${theme.colors.border}`,
-                                    textAlign: 'center'
-                                }}>
-                                    {header}
-                                </th>
+                                <th key={header} style={css.tableCell}>{header}</th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
                         {transactions.map(transaction => (
                             <tr key={transaction.id}>
-                                <td style={tdStyle}>
-                                    {transaction.description}
-                                </td>
-                                <td style={tdStyle}>
+                                <td style={css.tableCell}>{transaction.description}</td>
+                                <td style={css.tableCell}>
                                     {new Intl.NumberFormat('it-IT', {
                                         style: 'currency',
                                         currency: 'EUR'
                                     }).format(transaction.amount)}
                                 </td>
-                                <td style={tdStyle}>
-                                    {transaction.type}
-                                </td>
-                                <td style={tdStyle}>
-                                    {transaction.category}
-                                </td>
-                                <td style={tdStyle}>
+                                <td style={css.tableCell}>{transaction.type}</td>
+                                <td style={css.tableCell}>{transaction.category}</td>
+                                <td style={css.tableCell}>
                                     {new Date(transaction.date).toLocaleDateString('it-IT', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric'
                                     })}
                                 </td>
-
-                                <td style={tdStyle}>
-                                    <button
-                                        onClick={() => handleDelete(transaction.id)}
-                                        style={{
-                                            backgroundColor: theme.colors.danger || '#dc3545',
-                                            color: '#fff',
-                                            border: 'none',
-                                            padding: '0.4rem 0.8rem',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
+                                <td style={css.tableCell}>
+                                    <button style={css.deleteButton} onClick={() => handleDelete(transaction.id)}>
                                         Delete
                                     </button>
                                 </td>
@@ -194,7 +144,7 @@ function TransactionsList({ refreshKey, onTransactionDeleted }) {
                     </tbody>
                 </table>
             ) : (
-                <p style={{ textAlign: 'center', marginTop: '1rem' }}>No transactions</p>
+                <p style={css.emptyMessage}>No transactions</p>
             )}
         </div>
     );

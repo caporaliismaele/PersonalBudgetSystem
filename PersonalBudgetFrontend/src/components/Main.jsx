@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Balance from './Balance.jsx';
+import Balance from './Transactions/Balance.jsx';
 import TransactionsList from './Transactions/TransactionsList.jsx';
 import AddTransaction from './Transactions/AddTransaction.jsx';
 import CategoriesList from './Categories/CategoriesList.jsx';
 import AddCategory from './Categories/AddCategory.jsx';
 import AddPlannedTransaction from './PlannedTransactions/AddPlannedTransaction.jsx';
 import PlannedTransactionList from './PlannedTransactions/PlannedTransactionList.jsx';
+import IncomeExpenseRatio from './PlannedTransactions/IncomeExpenseRatio.jsx';
 import Charts from './Charts/Charts.jsx';
 import theme from '../styles/theme.js';
 
@@ -74,6 +75,7 @@ function Main() {
 
                 {activeTab === 'PlannedTransactions' && (
                     <div key={refreshKey}>
+                        <IncomeExpenseRatio refreshKey={refreshKey} />
                         <AddPlannedTransaction refreshKey={refreshKey} onPlannedTransactionAdded={handleRefresh} />
                         <PlannedTransactionList refreshKey={refreshKey} onPlannedTransactionDeleted={handleRefresh} />
                     </div>

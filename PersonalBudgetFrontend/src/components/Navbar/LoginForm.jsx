@@ -1,75 +1,90 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../AuthContext';
-import theme from '../../styles/theme.js';
+import css from '../../styles/css.js';
 
 function LoginForm({ onClose }) {
     const { login } = useContext(AuthContext);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+    });
+
     const [error, setError] = useState('');
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         axios
             .post('https://localhost:7163/api/auth/login', {
-                username: email,
-                password: password,
+                username: formData.email,
+                password: formData.password,
             })
             .then((res) => {
-                login(res.data); // { email, token }
+                login(res.data);
                 onClose();
             })
             .catch(() => setError('Invalid credentials'));
     };
 
     return (
-        <div
-            className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1050 }}
-        >
-            <div
-                className="bg-white p-4 rounded shadow"
-                style={{
-                    width: '100%',
-                    maxWidth: '400px',
-                    fontFamily: theme.font.family,
-                }}
-            >
-                <h4 className="mb-3 text-center" style={{ color: theme.colors.primary }}>
-                    Log In
-                </h4>
+        <div style={css.modalOverlay}>
+            <div style={css.modalBox}>
+                <h4 style={css.modalTitle}>Log In</h4>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
+                    <div style={{ marginBottom: '1rem' }}>
                         <input
                             type="email"
-                            className="form-control"
+                            name="email"
                             placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={formData.email}
+                            onChange={handleChange}
                             required
+                            style={{ ...css.formInput, width: '100%' }}
                         />
                     </div>
 
-                    <div className="mb-3">
+                    <div style={{ marginBottom: '1rem' }}>
                         <input
                             type="password"
-                            className="form-control"
+                            name="password"
                             placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={formData.password}
+                            onChange={handleChange}
                             required
+                            style={{ ...css.formInput, width: '100%' }}
                         />
                     </div>
 
-                    {error && <div className="text-danger mb-3">{error}</div>}
+                    {error && (
+                        <div style={{ color: css.deleteButton.backgroundColor, marginBottom: '1rem', textAlign: 'center' }}>
+                            {error}
+                        </div>
+                    )}
 
-                    <div className="d-grid gap-2">
-                        <button type="submit" className="btn btn-primary">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <button type="submit" style={css.formButton}>
                             Log In
                         </button>
-                        <button type="button" className="btn btn-outline-secondary" onClick={onClose}>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            style={{
+                                ...css.formButton,
+                                backgroundColor: '#fff',
+                                color: css.formButton.backgroundColor,
+                                border: `1px solid ${css.formButton.backgroundColor}`,
+                            }}
+                        >
                             Cancel
                         </button>
                     </div>

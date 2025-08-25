@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../AuthContext.jsx';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
-import theme from '../../styles/theme.js';
+import css from '../../styles/css.js';
 
 function Navbar() {
     const { user, logout } = useContext(AuthContext);
@@ -11,39 +11,65 @@ function Navbar() {
 
     return (
         <>
-            <nav
-                className="navbar navbar-expand-lg"
-                style={{
-                    backgroundColor: theme.colors.primary,
-                    color: '#fff',
-                    fontFamily: theme.font.family,
-                }}
-            >
-                <div className="container-fluid">
-                    <a className="navbar-brand text-white fw-bold" >
+            <nav style={css.navbar}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem 1.5rem',
+                }}>
+                    <span style={{
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                        color: '#fff',
+                    }}>
                         PersonalBudgetSystem
-                    </a>
+                    </span>
 
-                    <div className="d-flex align-items-center">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {!user ? (
                             <>
                                 <button
-                                    className="btn btn-outline-light me-2"
                                     onClick={() => setShowLogin(true)}
+                                    style={{
+                                        backgroundColor: 'transparent',
+                                        border: '1px solid #fff',
+                                        color: '#fff',
+                                        padding: '0.4rem 0.8rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                    }}
                                 >
                                     Log In
                                 </button>
                                 <button
-                                    className="btn btn-light"
                                     onClick={() => setShowRegister(true)}
+                                    style={{
+                                        backgroundColor: '#fff',
+                                        color: css.navbar.backgroundColor,
+                                        padding: '0.4rem 0.8rem',
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                    }}
                                 >
                                     Register
                                 </button>
                             </>
                         ) : (
                             <>
-                                <span className="text-white me-3">{user.email}</span>
-                                <button className="btn btn-outline-light" onClick={logout}>
+                                <span style={{ color: '#fff', fontWeight: '500' }}>{user.email}</span>
+                                <button
+                                    onClick={logout}
+                                    style={{
+                                        backgroundColor: 'transparent',
+                                        border: '1px solid #fff',
+                                        color: '#fff',
+                                        padding: '0.4rem 0.8rem',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
                                     Log Out
                                 </button>
                             </>

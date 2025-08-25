@@ -87,6 +87,34 @@ public class PlannedTransactionController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("income-expense-ratio")]
+    public async Task<ActionResult<decimal>> GetIncomeExpenseRatio()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Prendi solo le transazioni reali dell'utente
+        var userTransactions = await _context.Transactions
+            .Where(t => t.UserId == userId)
+            .ToListAsync();
+
+        if (!userTransactions.Any())
+            return Ok(0m); // niente transazioni, ritorna 0
+
+        var totalIncome = userTransactions
+            .Where(t => t.Type == "Income")
+            .Sum(t => t.Amount);
+
+        var totalExpense = userTransactions
+            .Where(t => t.Type == "Expense")
+            .Sum(t => t.Amount);
+
+        // Evita divisione per zero
+        var ratio = totalExpense == 0 ? totalIncome : totalIncome / totalExpense;
+
+        return Ok(Math.Round(ratio, 2));
+    }
+
 }
 public class PlannedTransactionCreateDto
 {

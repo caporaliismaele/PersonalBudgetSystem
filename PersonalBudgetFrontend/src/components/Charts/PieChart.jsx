@@ -1,7 +1,6 @@
-﻿import { useEffect, useState, useContext } from "react";
+﻿import { useEffect, useState} from "react";
 import { Pie } from "react-chartjs-2";
 import axios from "axios";
-import { AuthContext } from '../AuthContext.jsx';
 import {
     Chart as ChartJS,
     ArcElement,
@@ -15,10 +14,8 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export const PieChart = () => {
     const [type, setType] = useState("Income");
     const [data, setData] = useState(null);
-    const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        if (!user || !user.token) return;
 
         axios.get(`/api/charts/statsForType/${type}`, { withCredentials: true })
             .then(res => {
@@ -42,7 +39,7 @@ export const PieChart = () => {
         }).catch(err => {
             console.error("Errore nel caricamento dei dati:", err);
         });
-    }, [type, user]);
+    }, [type]);
 
     const inputStyle = {
         padding: '0.4rem 0.6rem',

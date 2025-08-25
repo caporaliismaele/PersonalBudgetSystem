@@ -1,14 +1,11 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../AuthContext.jsx';
-import theme from '../../styles/theme.js';
+import css from '../../styles/css.js';
 
 function CategoriesList({ refreshKey, onCategoryDeleted }) {
-    const { user } = useContext(AuthContext);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState('All');
-
 
     const fetchCategories = async () => {
         try {
@@ -31,8 +28,8 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
     };
 
     useEffect(() => {
-        if (user) fetchCategories();
-    }, [user, refreshKey, typeFilter]);
+        fetchCategories();
+    }, [refreshKey, typeFilter]);
 
     const handleDelete = async (id) => {
         try {
@@ -45,32 +42,18 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
 
     if (loading) return <div>Loading categories...</div>;
 
-    const tdStyle = { padding: '0.75rem', border: `1px solid ${theme.colors.border}`, textAlign: 'center' };
-    const inputStyle = {
-        padding: '0.6rem',
-        fontSize: '1rem',
-        borderRadius: '6px',
-        border: `1px solid ${theme.colors.border}`,
-        width: '200px',
-        marginTop: '0.3rem'
-    };
-    const labelStyle = {
-        fontWeight: 'bold',
-        marginBottom: '0.2rem',
-        fontSize: '1rem',
-        textAlign: 'center'
-    };
-
     return (
-        <div style={{ padding: '2rem', fontFamily: theme.font.family }}>
-            <h3 style={{ textAlign: 'center', color: theme.colors.primary, marginBottom: '1.5rem' }}>
-                Your Categories
-            </h3>
+        <div style={css.categoriesWrapper}>
+            <h3 style={css.categoriesTitle}>Your Categories</h3>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <label style={labelStyle}>Type</label>
-                    <select style={inputStyle} value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+            <div style={css.filterGroup}>
+                <div style={css.filterField}>
+                    <label style={css.formLabel}>Type</label>
+                    <select
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                        style={{ ...css.formSelect, width: '200px', marginTop: '0.3rem' }}
+                    >
                         <option value="All">All</option>
                         <option value="Income">Income</option>
                         <option value="Expense">Expense</option>
@@ -79,42 +62,23 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
             </div>
 
             {categories.length > 0 ? (
-                <table style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    backgroundColor: '#fff',
-                    boxShadow: theme.shadow.light,
-                }}>
+                <table style={css.table}>
                     <thead>
-                        <tr style={{ backgroundColor: theme.colors.primary, color: '#fff' }}>
-                            {['Name', 'Type', 'Action'].map(header => (
-                                <th key={header} style={{
-                                    padding: '0.75rem',
-                                    border: `1px solid ${theme.colors.border}`,
-                                    textAlign: 'center'
-                                }}>
+                        <tr style={css.tableHeader}>
+                            {['Name', 'Type', 'Action'].map((header) => (
+                                <th key={header} style={css.tableCell}>
                                     {header}
                                 </th>
                             ))}
                         </tr>
                     </thead>
                     <tbody>
-                        {categories.map(cat => (
+                        {categories.map((cat) => (
                             <tr key={cat.id}>
-                                <td style={tdStyle}>{cat.name}</td>
-                                <td style={tdStyle}>{cat.type}</td>
-                                <td style={tdStyle}>
-                                    <button
-                                        onClick={() => handleDelete(cat.id)}
-                                        style={{
-                                            backgroundColor: theme.colors.danger || '#dc3545',
-                                            color: '#fff',
-                                            border: 'none',
-                                            padding: '0.4rem 0.8rem',
-                                            borderRadius: '4px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
+                                <td style={css.tableCell}>{cat.name}</td>
+                                <td style={css.tableCell}>{cat.type}</td>
+                                <td style={css.tableCell}>
+                                    <button style={css.deleteButton} onClick={() => handleDelete(cat.id)}>
                                         Delete
                                     </button>
                                 </td>
@@ -123,7 +87,7 @@ function CategoriesList({ refreshKey, onCategoryDeleted }) {
                     </tbody>
                 </table>
             ) : (
-                <p style={{ textAlign: 'center', marginTop: '1rem' }}>No categories</p>
+                <p style={css.emptyMessage}>No categories</p>
             )}
         </div>
     );

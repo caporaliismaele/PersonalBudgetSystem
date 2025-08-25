@@ -1,39 +1,44 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { AuthContext } from '../AuthContext.jsx';
-import theme from '../../styles/theme.js';
+import css from '../../styles/css.js';
 
 function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
-    const { user } = useContext(AuthContext);
-    const [name, setName] = useState('');
-    const [amount, setAmount] = useState('');
-    const [type, setType] = useState('Income');
-    const [dayOfMonth, setDayOfMonth] = useState(1);
-    const [category, setCategory] = useState('');
-    const [description, setDescription] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        amount: '',
+        type: 'Income',
+        dayOfMonth: 1,
+        category: '',
+        description: '',
+    });
+
     const [categories, setCategories] = useState([]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!user) return;
-
         try {
-            const response = await axios.post('https://localhost:7163/api/plannedtransaction', {
-                name,
-                amount: parseFloat(amount),
-                type,
-                dayOfMonth: parseInt(dayOfMonth),
-                category,
-                description,
-            }, { withCredentials: true });
-
+            const payload = {
+                ...formData,
+                amount: parseFloat(formData.amount),
+                dayOfMonth: parseInt(formData.dayOfMonth),
+            };
+            const response = await axios.post('https://localhost:7163/api/plannedtransaction', payload, {
+                withCredentials: true
+            });
             onPlannedTransactionAdded(response.data);
-            setName('');
-            setAmount('');
-            setType('Income');
-            setDayOfMonth(1);
-            setCategory('');
-            setDescription('');
+            setFormData({
+                name: '',
+                amount: '',
+                type: 'Income',
+                dayOfMonth: 1,
+                category: '',
+                description: '',
+            });
         } catch (error) {
             console.error('Error adding planned transaction:', error);
         }
@@ -41,11 +46,16 @@ function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
 
     const fetchCategories = async (type) => {
         try {
-            const response = await axios.get('https://localhost:7163/api/categories', { withCredentials: true });
+            const response = await axios.get('https://localhost:7163/api/categories', {
+                withCredentials: true
+            });
             const filtered = response.data.filter(c => c.type === type);
             setCategories(filtered);
-            if (!filtered.find(c => c.name === category)) {
-                setCategory(filtered[0]?.name || '');
+            if (!filtered.find(c => c.name === formData.category)) {
+                setFormData(prev => ({
+                    ...prev,
+                    category: filtered[0]?.name || ''
+                }));
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -53,163 +63,94 @@ function AddPlannedTransaction({ refreshKey, onPlannedTransactionAdded }) {
     };
 
     useEffect(() => {
-        if (user) {
-            fetchCategories(type);
-        }
-    }, [user, type, refreshKey]);
-
-    const inputStyle = {
-        padding: '0.4rem 0.6rem',
-        border: `1px solid ${theme.colors.border}`,
-        borderRadius: '6px',
-        fontSize: theme.font.size,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        width: '140px',
-        textAlign: 'center',
-        backgroundColor: '#fff',
-        appearance: 'none', // uniforma i select
-    };
-
-    const labelStyle = {
-        textAlign: 'center',
-        fontWeight: '500',
-        color: theme.colors.text,
-        marginBottom: '0.4rem',
-    };
-
-    const fieldStyle = {
-        border: `1px solid ${theme.colors.border}`,
-        borderRadius: '6px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        marginBottom: theme.spacing.margin, // spaziatura verticale tra i campi
-
-    };
+        fetchCategories(formData.type);
+    }, [formData.type, refreshKey]);
 
     return (
-            <form
-                onSubmit={handleSubmit}
-                style={{
-                    backgroundColor: theme.colors.background,
-                    padding: theme.spacing.padding,
-                    borderRadius: '8px',
-                    fontFamily: theme.font.family,
-                    maxWidth: '800px',
-                    margin: '0 auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                <h3 style={{
-                color: theme.colors.primary,
-                textAlign: 'center',
-                marginBottom: '1.5rem',
-                }}>
-                    Add Planned Transaction
-            </h3>
+        <form onSubmit={handleSubmit} style={css.formWrapper}>
+            <h3 style={css.formTitle}>Add Planned Transaction</h3>
 
-            <p style={{
-                textAlign: 'center',
-                marginBottom: '1.5rem',
-            }}>
+            <p style={css.formSubtitle}>
                 The Planned Transaction created will create a transaction with a monthly frequence
             </p>
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexWrap: 'wrap',
-                        gap: theme.spacing.gap,
-                        marginBottom: theme.spacing.margin,
-                    }}
-                >
-                        <div style={fieldStyle}>
-                            <label style={labelStyle}>Description</label>
-                            <input
-                                type="text"
-                                value={description}
-                                onChange={e => setDescription(e.target.value)}
-                                placeholder="Description"
-                                style={inputStyle}
-                                required
-                            />
-                        </div>
 
-                        <div style={fieldStyle}>
-                            <label style={labelStyle}>Amount</label>
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={e => setAmount(e.target.value)}
-                                placeholder="Amount"
-                                style={inputStyle}
-                                required
-                            />
-                        </div>
+            <div style={css.formGroup}>
+                <div style={css.formField}>
+                    <label style={css.formLabel}>Description</label>
+                    <input
+                        type="text"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        placeholder="Description"
+                        style={{ ...css.formInput, width: '140px' }}
+                        required
+                    />
+                </div>
 
-                        <div style={fieldStyle}>
-                            <label style={labelStyle}>Type</label>
-                            <select
-                                value={type}
-                                onChange={e => setType(e.target.value)}
-                                style={inputStyle}
-                            >
-                                <option value="Income">Income</option>
-                                <option value="Expense">Expense</option>
-                            </select>
-                        </div>
+                <div style={css.formField}>
+                    <label style={css.formLabel}>Amount</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        placeholder="Amount"
+                        style={{ ...css.formInput, width: '140px' }}
+                        required
+                    />
+                </div>
 
-                        <div style={fieldStyle}>
-                            <label style={labelStyle}>Category</label>
-                            <select
-                                value={category}
-                                onChange={e => setCategory(e.target.value)}
-                                style={inputStyle}
-                                required
-                            >
-                                <option value="">-- Select a category --</option>
-                                {categories.length === 0 && <option disabled>No categories</option>}
-                                {categories.map(c => (
-                                    <option key={c.id} value={c.name}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                <div style={css.formField}>
+                    <label style={css.formLabel}>Type</label>
+                    <select
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
+                        style={{ ...css.formInput, width: '140px' }}
+                    >
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                </div>
 
-                        <div style={fieldStyle}>
-                            <label style={labelStyle}>Activation Day</label>
-                            <input
-                                type="number"
-                                min="1"
-                                max="31"
-                                value={dayOfMonth}
-                                onChange={e => setDayOfMonth(e.target.value)}
-                                placeholder="Day of Month"
-                                style={inputStyle}
-                                required
-                            />
-                        </div>
+                <div style={css.formField}>
+                    <label style={css.formLabel}>Category</label>
+                    <select
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        style={{ ...css.formInput, width: '140px' }}
+                        required
+                    >
+                        <option value="">-- Select a category --</option>
+                        {categories.length === 0 && <option disabled>No categories</option>}
+                        {categories.map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                    </select>
+                </div>
 
-                        <button
-                            type="submit"
-                            style={{
-                                backgroundColor: theme.colors.primary,
-                                color: '#fff',
-                                padding: theme.spacing.sm,
-                                border: 'none',
-                                borderRadius: '6px',
-                                fontSize: theme.font.size,
-                                cursor: 'pointer',
-                                minWidth: '160px',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                marginTop: theme.spacing.margin,
-                            }}
-                        >
-                            Add Planned Transaction
-                    </button>
-               </div>
-            </form>
+                <div style={css.formField}>
+                    <label style={css.formLabel}>Activation Day</label>
+                    <input
+                        type="number"
+                        name="dayOfMonth"
+                        min="1"
+                        max="31"
+                        value={formData.dayOfMonth}
+                        onChange={handleChange}
+                        placeholder="Day of Month"
+                        style={{ ...css.formInput, width: '140px' }}
+                        required
+                    />
+                </div>
+
+                <button type="submit" style={{ ...css.formButton, minWidth: '160px' }}>
+                    Add Planned Transaction
+                </button>
+            </div>
+        </form>
     );
 }
 

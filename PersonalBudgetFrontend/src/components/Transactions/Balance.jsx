@@ -1,22 +1,18 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AuthContext } from './AuthContext.jsx';
-import theme from '../styles/theme.js';
+import css from '../../styles/css.js';
+import theme from '../../styles/theme.js';
 
 function Balance() {
-    const { user } = useContext(AuthContext);
     const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(true);
 
     const formattedBalance = new Intl.NumberFormat('it-IT', {
         style: 'currency',
-        currency: 'EUR'
+        currency: 'EUR',
     }).format(balance);
 
-
     useEffect(() => {
-        if (!user) return;
-
         axios
             .get('https://localhost:7163/api/transactions/balance')
             .then((response) => {
@@ -27,12 +23,12 @@ function Balance() {
                 console.error('Error fetching balance:', error);
                 setLoading(false);
             });
-    }, [user]);
+    }, []);
 
     if (loading) {
         return (
-            <div className="text-center py-4" style={{ fontFamily: theme.font.family }}>
-                <span className="text-muted">Loading balance...</span>
+            <div style={{ textAlign: 'center', padding: '1rem', fontFamily: css.appWrapper.fontFamily }}>
+                <span style={{ color: '#6c757d' }}>Loading balance...</span>
             </div>
         );
     }
@@ -42,21 +38,21 @@ function Balance() {
 
     return (
         <div
-            className="text-center p-4 mb-4 rounded shadow-sm"
             style={{
-                backgroundColor: '#fff',
-                fontFamily: theme.font.family,
+                ...css.highlightBox,
                 borderLeft: `6px solid ${balanceColor}`,
             }}
         >
-            <h4 style={{ color: balanceColor, fontWeight: 'bold', marginBottom: '1rem' }}>Balance</h4>
-            <div
+            <h4
                 style={{
-                    fontSize: '3rem',
-                    fontWeight: 'bold',
+                    ...css.highlightTitle,
                     color: balanceColor,
+                    fontSize: '1.25rem',
                 }}
             >
+                Balance
+            </h4>
+            <div style={{ ...css.highlightValue, color: balanceColor }}>
                 {formattedBalance}
             </div>
         </div>

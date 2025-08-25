@@ -1,8 +1,8 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import axios from "axios";
-import { AuthContext } from "../AuthContext.jsx";
-import theme from '../../styles/theme.js';
+
+import css from "../../styles/css.js";
 
 import {
     Chart as ChartJS,
@@ -25,11 +25,8 @@ ChartJS.register(
 
 export const LineChartPointStyling = () => {
     const [data, setData] = useState(null);
-    const { user } = useContext(AuthContext);
 
     useEffect(() => {
-        if (!user || !user.token) return;
-
         axios
             .get("/api/charts/balance", { withCredentials: true })
             .then((res) => {
@@ -59,29 +56,13 @@ export const LineChartPointStyling = () => {
             .catch((err) => {
                 console.error("Errore nel caricamento dei dati:", err);
             });
-
-    }, [user]);
+    }, []);
 
     if (!data) return <p>Loading...</p>;
 
-  return (
-        <div style={{
-            backgroundColor: theme.colors.background,
-            padding: theme.spacing.padding,
-            textAlign: "center",
-            fontFamily: theme.font.family,
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-        }}>
-          <h3 style={{
-              color: theme.colors.primary,
-              textAlign: 'center',
-              marginBottom: '1.5rem',
-          }}>
-              Monthly Balance Overview
-          </h3>
+    return (
+        <div style={css.chartsWrapper}>
+            <h3 style={css.chartsTitle}>Monthly Balance Overview</h3>
 
             <Line
                 key={JSON.stringify(data)}
@@ -98,7 +79,7 @@ export const LineChartPointStyling = () => {
                             callbacks: {
                                 label: (context) => {
                                     const value = context.raw;
-                                    return `${value.toLocaleString()} € `;
+                                    return `${value.toLocaleString()}`;
                                 }
                             }
                         }
@@ -122,12 +103,12 @@ export const LineChartPointStyling = () => {
                                 text: "Money"
                             },
                             ticks: {
-                                callback: (value) => `${value} €`
+                                callback: (value) => `${value}`
                             }
                         }
                     }
                 }}
-              />
+            />
         </div>
     );
 };
